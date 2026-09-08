@@ -1,0 +1,23 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ipynb_checkpoints/
+data/processed/
+data/processed_eicu/
+data/processed_mimic/
+data/eicu/
+data/mimic/
+data/Synthetic_patient-HealthCare-Monitoring_dataset.csv
+artifacts/
+*.pt
+*.pth
+*.ckpt
+# regenerable per-user / GBDT-train dumps (keep the small W×K tables)
+data/processed_w2k3/customer_assignment.csv
+data/processed_w2k3/customer_rates.csv
+data/processed_w2k3/criticality_scores.csv
+data/processed_w2k3/criticality_scores.npz
+data/processed_w2k3/reluctance/train_table.csv
+data/processed_w2k3/reluctance/train_slots.npz
+data/processed_w2k3/reluctance/stress_slot.npz
