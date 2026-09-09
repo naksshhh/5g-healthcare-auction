@@ -21,11 +21,10 @@ IEEE-style draft: *Efficient Resource Allocation and Payment Scheme for 5G-based
 - `fig7_payments_surplus.png`
 - `fig_omega_const.png`
 
-Older 4×3 / MIMIC / stress–GBDT plots: `report/archive/` or unused files still sitting in `current/`.
+Older 4×3 / MIMIC plots: `report/archive/`.
 
 Mentor notes (not in the IEEE draft):
 - `README_bid_privacy_for_mentor.md` — why PRE cannot hide bids; SOTA ranking
-- `README_dynamic_reluctance_for_mentor.md` — **not** paper 1 (time-varying \(\omega\))
 
 ```bash
 cd report

@@ -17,7 +17,7 @@ _STEP_FILES = {
     "mimic_preprocess": "07_mimic_preprocess.py",
     "economic_figures": "08_economic_figures.py",
     "reluctance": "09_reluctance.py",
-    "reluctance_figures": "10_reluctance_figures.py",
+    "w3k2_final": "11_w3k2_final.py",
 }
 
 

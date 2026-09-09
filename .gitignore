@@ -21,3 +21,14 @@ data/processed_w2k3/criticality_scores.npz
 data/processed_w2k3/reluctance/train_table.csv
 data/processed_w2k3/reluctance/train_slots.npz
 data/processed_w2k3/reluctance/stress_slot.npz
+# 3×2 per-user dumps and leftover optimizer traces
+final result/market/customer_assignment.csv
+final result/market/customer_rates.csv
+final result/market/criticality_scores.csv
+final result/market/patients_all.csv
+final result/market/auction_clearing.npz
+final result/market/rho_wk.npz
+final result/figures/trace_delta_*.npz
+final result/preference_sweep/*N10*
+# third-party paper PDF
+*.pdf

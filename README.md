@@ -2,7 +2,14 @@
 
 B.Tech project pipeline that couples **LSTM vital-sign forecasting** with a **game-theoretic double auction**. Predicted patient criticality drives the preference matrix ρ_{wk}; KKT stationarity plus dual sub-gradient clearing then allocate uplink data rates between base stations (sellers) and healthcare service providers (buyers).
 
-**Paper 1 (current):** eICU-CRD Demo, **W = 2** unlabeled buyers (HSP1 / HSP2, random split, seed 42), **K = 3** cells, **dynamic preference** (max-normalized into (0, 1]), **constant reluctance** from one radio snapshot, **r_k^max = 5 Mbps** per BS (no load scaling). Clearing: welfare **10.65**, total rate **15.01 Mbps**, payment **4.37**. Draft: `report/main.tex`. Bid-privacy note (memo only): `report/README_bid_privacy_for_mentor.md`.
+**Paper 1 (current):** eICU-CRD Demo, LSTM + NEWS2 fusion, **max-normalized** ρ, **constant reluctance** from one radio snapshot, **r_k^max = 5 Mbps** per cell.
+
+- Draft 2 HSP × 3 BS tables: `data/processed_w2k3/`, `report/main.tex`.
+- Final 3 HSP × 2 BS market and figures: `final result/`.
+
+Time-varying (dynamic) reluctance is **not** in this repository.
+
+Bid-privacy note (memo only): `report/README_bid_privacy_for_mentor.md`.
 
 Tables for that run live in `data/processed_w2k3/`. Do not treat Emergency/Cardiology labels, 120 Mbps cells, or welfare 22.66 as paper-1 numbers.
 
@@ -64,7 +71,9 @@ cleared rates, prices, payments, per-patient d_n
 
 ## 3. Dataset
 
-Source: `data/Synthetic_patient-HealthCare-Monitoring_dataset.csv` (Kaggle-style synthetic healthcare monitoring).
+Default source is the open-access **[eICU-CRD Demo v2.0.1](https://physionet.org/content/eicu-crd-demo/2.0.1/)**. `src/01_preprocess.py` downloads it into `data/eicu/` (gitignored). The full credentialed eICU-CRD can be dropped in the same folder.
+
+Do not commit raw PhysioNet CSVs or LSTM checkpoints (`*.pt`). Small cleared W×K tables live in `data/processed_w2k3/` and `final result/`.
 
 
 | Property       | Value                                                                       |
@@ -312,6 +321,12 @@ Paper-1 market tables (eICU already fused; skip LSTM if `processed_w2k3` exists)
 .\.venv\Scripts\python src\08_economic_figures.py --processed-dir data\processed_w2k3 --figdir artifacts\w2k3\figures --omega-path data\processed_w2k3\reluctance\omega_frozen.npz
 ```
 
+3 HSP × 2 BS market (writes `final result/` only; does not overwrite paper-1 `data/processed_w2k3`):
+
+```bash
+.\.venv\Scripts\python src\11_w3k2_final.py
+```
+
 ---
 
 
@@ -320,9 +335,10 @@ Paper-1 market tables (eICU already fused; skip LSTM if `processed_w2k3` exists)
 
 ```
 5g-healthcare-auction/
-├── data/processed_w2k3/    paper-1 W=2 K=3 tables (ρ, ω, clearing)
+├── data/processed_w2k3/    paper-1 W=2 K=3 tables (ρ, frozen ω, clearing)
+├── final result/           3 HSP × 2 BS figures and small market tables
 ├── src/                    preprocess → LSTM → fusion → aggregate → auction
-├── report/                 IEEE draft + mentor notes
+├── report/                 IEEE draft + bid-privacy memo
 ├── main.py
 └── requirements.txt
 ```

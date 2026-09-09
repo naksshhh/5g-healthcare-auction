@@ -1,0 +1,43 @@
+{
+  "n_users": 74454,
+  "n_unique_stays": 1821,
+  "how": "Each eICU vital window is one uplink user. Users are placed uniformly on a 2 km \u00d7 2 km map (seed 42), associated to the stronger of two cells by max RSRP, and subscribed to HSP1/HSP2/HSP3 by an independent uniform draw (seed 42+7). No disease-to-hospital map.",
+  "users_per_hsp": {
+    "HSP1": 24855,
+    "HSP2": 24701,
+    "HSP3": 24898
+  },
+  "users_per_bs": {
+    "BS1": 37317,
+    "BS2": 37137
+  },
+  "N_wk": {
+    "BS1": {
+      "HSP1": 12402,
+      "HSP2": 12429,
+      "HSP3": 12486
+    },
+    "BS2": {
+      "HSP1": 12453,
+      "HSP2": 12272,
+      "HSP3": 12412
+    }
+  },
+  "C_wk": {
+    "BS1": {
+      "HSP1": 1439.8895590113618,
+      "HSP2": 1432.5398852094806,
+      "HSP3": 1438.6707956772234
+    },
+    "BS2": {
+      "HSP1": 1422.177627209903,
+      "HSP2": 1426.8037265492753,
+      "HSP3": 1420.2400026662867
+    }
+  },
+  "share_per_hsp": {
+    "HSP1": 0.3338302844709485,
+    "HSP2": 0.3317618932495232,
+    "HSP3": 0.3344078222795283
+  }
+}

@@ -74,7 +74,9 @@ def _save(fig, figdir: Path, stem: str) -> None:
     plt.close(fig)
 
 
-def _publish(figdir: Path) -> None:
+def _publish(figdir: Path, copy_to_report: bool = True) -> None:
+    if not copy_to_report:
+        return
     dest = ROOT / "report" / "current"
     dest.mkdir(parents=True, exist_ok=True)
     for stem in STEMS:
@@ -160,16 +162,29 @@ def fig_preference_anatomy(data: dict, figdir: Path) -> None:
             )
         ax.set_xticks(x, HSP_PAPER[:n_hsp])
         ax.set_ylabel(ylabel)
-        ax.legend(fontsize=6.5, framealpha=0.92, ncol=2, handlelength=1.4)
         if "Mean" in ylabel:
             lo = float(mat.min())
             hi = float(mat.max())
-            pad = 0.15 * max(hi - lo, 1e-3)
+            pad = 0.18 * max(hi - lo, 1e-3)
             ax.set_ylim(lo - pad, hi + pad)
+        else:
+            hi = float(np.nanmax(mat))
+            ax.set_ylim(0.0, 1.18 * max(hi, 1e-9))
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(
+        handles,
+        labels,
+        loc="upper center",
+        ncol=n_bs,
+        fontsize=7,
+        framealpha=0.95,
+        bbox_to_anchor=(0.5, 1.04),
+        handlelength=1.6,
+    )
     axes[0].set_xlabel("HSP")
     axes[1].set_xlabel("HSP")
     axes[2].set_xlabel("HSP")
-    fig.tight_layout()
+    fig.tight_layout(rect=(0.0, 0.0, 1.0, 0.93))
     _save(fig, figdir, STEMS[0])
 
 
@@ -236,8 +251,10 @@ def _clear_once(opt, mkt: dict, rho: np.ndarray, max_iter: int, seed: int) -> di
     h, active = mkt["h"], mkt["active"]
     rng = np.random.default_rng(seed)
     pi_floor = max(cfg.pi_min, 0.5 * cfg.cost_c)
+    start = 0.32 if getattr(cfg, "pi_init", None) is None else float(cfg.pi_init)
+    step0 = 0.08 if float(cfg.step0) <= 0.05 else float(cfg.step0)
     pi = np.clip(
-        cfg.cost_c + 0.04 * np.maximum(rho, 0.0) + 0.005 * rng.random(rho.shape),
+        start + 0.01 * rng.random(rho.shape),
         pi_floor,
         cfg.pi_max,
     )
@@ -258,7 +275,7 @@ def _clear_once(opt, mkt: dict, rho: np.ndarray, max_iter: int, seed: int) -> di
         if gap < cfg.tol and volume >= min_volume:
             break
         excess = d - r
-        step = cfg.step0 / np.sqrt(t)
+        step = step0 / np.sqrt(t)
         pi = np.clip(pi + step * excess / (1.0 + np.abs(excess)), pi_floor, cfg.pi_max)
         pi = np.where(active, pi, pi_floor)
     d, r, pi, gap = best
@@ -297,8 +314,8 @@ def _rho_sweep(
 
 def fig_preference_payment(data: dict, sweep: dict, figdir: Path) -> None:
     n_bs, n_hsp = data["rho"].shape
-    fig = plt.figure(figsize=(8.8, 6.4))
-    gs = GridSpec(2, 2, height_ratios=(1.0, 1.05), hspace=0.38, wspace=0.32)
+    fig = plt.figure(figsize=(8.8, 7.0))
+    gs = GridSpec(2, 2, height_ratios=(1.0, 1.05), hspace=0.38, wspace=0.32, top=0.97, bottom=0.16)
 
     ax_rate = fig.add_subplot(gs[0, 0])
     ax_pay = fig.add_subplot(gs[0, 1])
@@ -344,8 +361,8 @@ def fig_preference_payment(data: dict, sweep: dict, figdir: Path) -> None:
         )
         for i in range(n_bs)
     ]
-    ax_rate.legend(handles=hsp_handles, fontsize=7, framealpha=0.92, loc="upper left")
-    ax_pay.legend(handles=bs_handles, fontsize=7, framealpha=0.92, loc="upper left")
+    ax_rate.legend(handles=hsp_handles, fontsize=7, framealpha=0.95, loc="lower right")
+    ax_pay.legend(handles=bs_handles, fontsize=7, framealpha=0.95, loc="lower right")
 
     ax_rate2 = ax_sens.twinx()
     ax_rate2.grid(False)
@@ -378,7 +395,16 @@ def fig_preference_payment(data: dict, sweep: dict, figdir: Path) -> None:
     ax_sens.xaxis.set_major_locator(MaxNLocator(nbins=6))
     h1, l1 = ax_sens.get_legend_handles_labels()
     h2, l2 = ax_rate2.get_legend_handles_labels()
-    ax_sens.legend(h1 + h2, l1 + l2, ncol=3, fontsize=7, loc="upper left", framealpha=0.92)
+    ax_sens.legend(
+        h1 + h2,
+        l1 + l2,
+        ncol=3,
+        fontsize=7,
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.22),
+        framealpha=0.95,
+        handlelength=2.2,
+    )
 
     _save(fig, figdir, STEMS[2])
 
@@ -390,6 +416,7 @@ def generate_economic_figures(
     seed: int = 42,
     clearing_dir: Path | None = None,
     omega_path: Path | None = None,
+    copy_to_report: bool = True,
 ) -> Path:
     processed_dir = Path(processed_dir or DEFAULT_PROCESSED)
     figdir = Path(figdir or DEFAULT_FIGDIR)
@@ -419,7 +446,7 @@ def generate_economic_figures(
         "sweep_unit_price": sweep["unit"].tolist(),
     }
     (figdir / "economic_figure_summary.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
-    _publish(figdir)
+    _publish(figdir, copy_to_report=copy_to_report)
     print(f"[econ] wrote {figdir}")
     return figdir
 

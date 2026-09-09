@@ -59,6 +59,7 @@ class OptimizerConfig:
     seed: int = 42
     omega_path: Path | None = None
     clearing_dir: Path | None = None
+    pi_init: float | None = None
 
     def __post_init__(self) -> None:
         self.processed_dir = Path(self.processed_dir)
@@ -281,7 +282,12 @@ def run_optimizer(cfg: OptimizerConfig | None = None) -> dict[str, Path]:
 
     pi_floor = max(cfg.pi_min, 0.5 * cfg.cost_c)
     rng = np.random.default_rng(cfg.seed)
-    pi = np.clip(cfg.cost_c + 0.04 * np.maximum(rho, 0.0) + 0.005 * rng.random((w, k)), pi_floor, cfg.pi_max)
+    if cfg.pi_init is not None:
+        pi = np.full((w, k), float(cfg.pi_init), dtype=np.float64)
+        pi = pi + 0.01 * rng.random((w, k))
+    else:
+        pi = cfg.cost_c + 0.04 * np.maximum(rho, 0.0) + 0.005 * rng.random((w, k))
+    pi = np.clip(pi, pi_floor, cfg.pi_max)
     pi = np.where(active, pi, pi_floor)
 
     d_bar = np.zeros_like(rho)
